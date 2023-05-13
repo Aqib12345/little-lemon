@@ -1,28 +1,55 @@
 package aqib.littlelemon.composables
 
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import aqib.littlelemon.R
+import aqib.littlelemon.helpers.rememberImeState
 import aqib.littlelemon.navigation.Home
 import aqib.littlelemon.ui.theme.PrimaryGreen
 
 @Composable
 fun Onboarding(navHostController: NavHostController) {
+    val firstName = remember {
+        mutableStateOf("")
+    }
+
+    val lastName = remember {
+        mutableStateOf("")
+    }
+
+    val email = remember {
+        mutableStateOf("")
+    }
+
+    val imeState = rememberImeState()
+    val scrollState = rememberScrollState()
+    
+    
+    LaunchedEffect(key1 = imeState.value){
+        if (imeState.value){
+            scrollState.scrollTo(scrollState.maxValue)
+        }
+    }
+
+
     Column(
         Modifier
             .fillMaxSize()
-            .padding(20.dp),
+            .padding(20.dp)
+            .verticalScroll(scrollState),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(20.dp)) {
         Row(Modifier.fillMaxWidth(0.6f)) {
@@ -43,8 +70,10 @@ fun Onboarding(navHostController: NavHostController) {
         modifier = Modifier.fillMaxWidth(),
         style = MaterialTheme.typography.h3)
         OutlinedTextField(
-            value = "",
-            onValueChange ={},
+            value = firstName.value,
+            onValueChange ={
+                           firstName.value = it
+            },
             label = { Text(text = "First Name")},
             singleLine = true,
             placeholder = { Text(text = "John")},
@@ -55,8 +84,10 @@ fun Onboarding(navHostController: NavHostController) {
             modifier = Modifier.fillMaxWidth())
 
         OutlinedTextField(
-            value = "",
-            onValueChange ={},
+            value = lastName.value,
+            onValueChange ={
+                           lastName.value = it
+            },
             label = { Text(text = "Last Name")},
             singleLine = true,
             placeholder = { Text(text = "Doe")},
@@ -67,8 +98,10 @@ fun Onboarding(navHostController: NavHostController) {
             modifier = Modifier.fillMaxWidth())
 
         OutlinedTextField(
-            value = "",
-            onValueChange ={},
+            value = email.value,
+            onValueChange ={
+                           email.value = it
+            },
             label = { Text(text = "Email")},
             singleLine = true,
             placeholder = { Text(text = "johndoe@gmail.com")},
