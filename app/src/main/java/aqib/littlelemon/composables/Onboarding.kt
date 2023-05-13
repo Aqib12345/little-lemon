@@ -1,5 +1,7 @@
 package aqib.littlelemon.composables
 
+import android.content.Context
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -17,11 +19,14 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import aqib.littlelemon.R
 import aqib.littlelemon.helpers.rememberImeState
+import aqib.littlelemon.helpers.validateRegData
 import aqib.littlelemon.navigation.Home
+import aqib.littlelemon.navigation.Onboarding
 import aqib.littlelemon.ui.theme.PrimaryGreen
 
 @Composable
-fun Onboarding(navHostController: NavHostController) {
+fun Onboarding(context: Context, navHostController: NavHostController) {
+    val  sharedPreferences = context.getSharedPreferences("Little Lemon", Context.MODE_PRIVATE)
     val firstName = remember {
         mutableStateOf("")
     }
@@ -114,7 +119,27 @@ fun Onboarding(navHostController: NavHostController) {
         Spacer(modifier = Modifier.size(40.dp))
         
         Button(onClick = {
-                         navHostController.navigate(Home.route)
+                if (validateRegData(
+                        firstName.value,
+                        lastName.value,
+                        email.value)){
+                    sharedPreferences.edit()
+                        .putString("firstName", firstName.value)
+                        .putString("lastName", lastName.value)
+                        .putString("email", email.value)
+                        .putBoolean("userRegistered", true)
+                        .apply()
+
+                    navHostController.navigate(Home.route)
+
+                }
+                else{
+                    Toast.makeText(context,
+                        "Invalid Details, Please try again",
+                        Toast.LENGTH_SHORT)
+                        .show()
+                }
+
         },
             modifier = Modifier
                 .fillMaxWidth()

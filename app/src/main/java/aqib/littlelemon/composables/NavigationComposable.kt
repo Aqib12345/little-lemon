@@ -1,5 +1,7 @@
 package aqib.littlelemon.composables
 
+import android.content.Context
+import android.content.SharedPreferences
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
@@ -11,14 +13,21 @@ import aqib.littlelemon.navigation.Onboarding
 import aqib.littlelemon.navigation.Profile
 
 @Composable
-fun NavigationComposable(navController: NavHostController) {
+fun NavigationComposable(context: Context,navController: NavHostController) {
 
-    NavHost(navController = navController, startDestination = Onboarding.route){
+    val sharedPreferences = context.getSharedPreferences("Little Lemon", Context.MODE_PRIVATE)
+    var startDestination = Onboarding.route
+
+    if (sharedPreferences.getBoolean("userRegistered", false)) {
+        startDestination = Home.route
+    }
+
+    NavHost(navController = navController, startDestination = startDestination){
         composable(Onboarding.route){
-            Onboarding(navController)
+            Onboarding(context, navController)
         }
         composable(Home.route){
-            Home()
+            Home(context)
         }
         composable(Profile.route){
             Profile()

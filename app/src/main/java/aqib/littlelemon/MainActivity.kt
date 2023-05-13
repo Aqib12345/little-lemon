@@ -16,7 +16,10 @@ import aqib.littlelemon.composables.Onboarding
 import aqib.littlelemon.ui.theme.LittleLemonTheme
 
 class MainActivity : ComponentActivity() {
+    val sharedPreferences by lazy { getSharedPreferences("Little Lemon", MODE_PRIVATE) }
     override fun onCreate(savedInstanceState: Bundle?) {
+
+
 
         super.onCreate(savedInstanceState)
         setContent {
@@ -27,7 +30,7 @@ class MainActivity : ComponentActivity() {
                     color = MaterialTheme.colors.background
                 ) {
                     val navController = rememberNavController()
-                    NavigationComposable(navController = navController)
+                    NavigationComposable(context = applicationContext,navController = navController)
                 }
             }
         }
