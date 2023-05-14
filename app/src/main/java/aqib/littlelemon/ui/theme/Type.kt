@@ -1,7 +1,6 @@
 package aqib.littlelemon.ui.theme
 
 import androidx.compose.material.Typography
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
@@ -32,7 +31,6 @@ val Typography = Typography(
         fontSize = 18.sp,
         color = PrimaryGreen
     ),
-
 
     /* Other default text styles to override
     button = TextStyle(

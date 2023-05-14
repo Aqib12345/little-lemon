@@ -1,6 +1,6 @@
 package aqib.littlelemon.composables
 
-import android.content.Context
+import android.util.Log
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -8,8 +8,7 @@ import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Search
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -31,18 +30,26 @@ import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
 
 @Composable
-fun Home(context: Context, navController: NavHostController) {
+fun Home(navController: NavHostController) {
 
     val viewModel: MyViewModel = viewModel()
     val databaseMenuItems = viewModel.getAllDatabaseMenuItems().observeAsState(emptyList()).value
+    val searchPhrase = remember {
+        mutableStateOf("")
+    }
+
     LaunchedEffect(Unit) {
         viewModel.fetchMenuDataIfNeeded()
     }
 
+
+
     Column() {
         Header(navController)
-        UpperPanel()
-        LowerPanel(databaseMenuItems)
+        UpperPanel(){
+            searchPhrase.value = it
+        }
+        LowerPanel(databaseMenuItems, searchPhrase)
     }
 
 
@@ -80,7 +87,12 @@ fun Header(navController: NavHostController){
 
 
 @Composable
-fun UpperPanel() {
+fun UpperPanel(search : (parameter: String)-> Unit) {
+    val searchPhrase = remember {
+        mutableStateOf("")
+    }
+
+    Log.d("AAAAA", "UpperPanel: ${searchPhrase.value}")
     Column(modifier = Modifier
         .background(PrimaryGreen)
         .padding(horizontal = 20.dp, vertical = 10.dp)) {
@@ -102,8 +114,11 @@ fun UpperPanel() {
         }
         
         Spacer(modifier = Modifier.size(10.dp))
-        OutlinedTextField(value = "", 
-            onValueChange = {},
+        OutlinedTextField(value = searchPhrase.value,
+            onValueChange = {
+                            searchPhrase.value = it
+                            search(searchPhrase.value)
+            },
             placeholder = {
                 Text(text = "Enter Search Phrase")
             },
@@ -122,19 +137,50 @@ fun UpperPanel() {
 }
 
 @Composable
-fun LowerPanel(databaseMenuItems: List<MenuItemRoom>) {
-    
-    val categories = databaseMenuItems.map { 
+fun LowerPanel(databaseMenuItems: List<MenuItemRoom>, search: MutableState<String>) {
+    val categories = databaseMenuItems.map {
         it.category.replaceFirstChar {character ->
             character.uppercase()
         }
     }.toSet()
+
+
+    val selectedCategory = remember {
+        mutableStateOf("")
+    }
+
+
+    val items = if(search.value == ""){
+        databaseMenuItems
+
+    }
+    else{
+        databaseMenuItems.filter {
+            it.title.contains(search.value, ignoreCase = true)
+
+        }
+
+
+    }
+
+
+
+    val filteredItems = if(selectedCategory.value == "" || selectedCategory.value == "all"){
+        items
+    }
+    else{
+        items.filter {
+            it.category.contains(selectedCategory.value, ignoreCase = true)
+        }
+    }
     
+
     Column {
-        MenuCategories(categories)
+        MenuCategories(categories) {selectedCategory.value = it
+        }
         Spacer(modifier = Modifier.size(2.dp))
         Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
-            for (item in databaseMenuItems){
+            for (item in filteredItems){
                 MenuItem(item = item)
             }
         }
@@ -144,7 +190,11 @@ fun LowerPanel(databaseMenuItems: List<MenuItemRoom>) {
 
 
 @Composable
-fun MenuCategories(categories: Set<String>) {
+fun MenuCategories(categories: Set<String>, categoryLambda : (sel: String) -> Unit) {
+    val cat = remember {
+        mutableStateOf("")
+    }
+
     Card(elevation = 10.dp, modifier = Modifier.fillMaxWidth()) {
 
         Column(Modifier.padding(horizontal = 20.dp, vertical = 10.dp)) {
@@ -154,19 +204,37 @@ fun MenuCategories(categories: Set<String>) {
                 .horizontalScroll(rememberScrollState())
                 .padding(top = 10.dp),
             horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                for (category in categories){
-                    CategoryButton(category = category)
+
+                CategoryButton(category = "All"){
+                    cat.value = it.lowercase()
+                    categoryLambda(it.lowercase())
                 }
+
+                for (category in categories){
+                    CategoryButton(category = category){
+                        cat.value = it
+                        categoryLambda(it)
+                    }
+
+                }
+
             }
         }
     }
 }
 
 @Composable
-fun CategoryButton(category:String) {
-    OutlinedButton(onClick = { /*TODO*/ },
+fun CategoryButton(category:String, selectedCategory: (sel: String) -> Unit) {
+    val isClicked = remember{
+        mutableStateOf(false)
+    }
+    OutlinedButton(onClick = {
+        isClicked.value = !isClicked.value
+        selectedCategory(category)
+
+    },
                     colors = ButtonDefaults.outlinedButtonColors(
-                        contentColor = PrimaryGreen,
+                        contentColor = PrimaryGreen
 
                     )) {
         Text(text = category)
