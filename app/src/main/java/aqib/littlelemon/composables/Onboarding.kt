@@ -130,7 +130,16 @@ fun Onboarding(context: Context, navHostController: NavHostController) {
                         .putBoolean("userRegistered", true)
                         .apply()
 
-                    navHostController.navigate(Home.route)
+                    Toast.makeText(context,
+                        "Registration Successful",
+                        Toast.LENGTH_SHORT)
+                        .show()
+
+
+                    navHostController.navigate(Home.route){
+                        popUpTo(Onboarding.route){inclusive = true}
+                        launchSingleTop = true
+                    }
 
                 }
                 else{

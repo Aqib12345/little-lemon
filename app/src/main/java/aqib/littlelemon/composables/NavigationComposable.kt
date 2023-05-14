@@ -27,10 +27,10 @@ fun NavigationComposable(context: Context,navController: NavHostController) {
             Onboarding(context, navController)
         }
         composable(Home.route){
-            Home(context)
+            Home(context, navController)
         }
         composable(Profile.route){
-            Profile()
+            Profile(context, navController)
         }
     }
 }
