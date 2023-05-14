@@ -24,8 +24,7 @@ import aqib.littlelemon.Data.MenuItemRoom
 import aqib.littlelemon.Data.MyViewModel
 import aqib.littlelemon.R
 import aqib.littlelemon.navigation.Profile
-import aqib.littlelemon.ui.theme.PrimaryGreen
-import aqib.littlelemon.ui.theme.PrimaryYellow
+import aqib.littlelemon.ui.theme.*
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
 
@@ -228,14 +227,14 @@ fun CategoryButton(category:String, selectedCategory: (sel: String) -> Unit) {
     val isClicked = remember{
         mutableStateOf(false)
     }
-    OutlinedButton(onClick = {
+    Button(onClick = {
         isClicked.value = !isClicked.value
         selectedCategory(category)
 
     },
-                    colors = ButtonDefaults.outlinedButtonColors(
-                        contentColor = PrimaryGreen
-
+                    colors = ButtonDefaults.buttonColors(
+                        contentColor = PrimaryGreen,
+                        backgroundColor = Secondary2
                     )) {
         Text(text = category)
     }
